@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:EasyCook3.ViewModels"
+             x:Class="EasyCook3.MainPage"
+             Title="Home">
+
+    <ScrollView>
+        <VerticalStackLayout
+        Spacing="25"
+        Padding="30,0"
+        VerticalOptions="Center">
+
+            <SearchBar Placeholder="Buscar recetas"
+                   CancelButtonColor="Red"
+                   TextColor="White"
+                   HeightRequest="60"
+                   FontSize="20">
+                <!--SearchButtonPressed="onButtonPressed"-->
+                <!--- =================================================================== TODO =================================================================== 
+                    1- DARLE FUNCIONALIDAD AL BOTON DE BUSCAR                                       - 
+                    2- MANDAR DATOS, A LA SECCION RECETA, AL HACER CLICK SOBRE LA MISMA             - OK
+            -->
+
+            </SearchBar>
+
+            <Picker x:Name="picker"
+                Title="Ordenar por:"
+                HorizontalTextAlignment="End"
+                WidthRequest="120"
+                TextColor="White"
+                HorizontalOptions="End"
+                SelectedIndexChanged="OnPickerSelectedIndexChanged">
+                <Picker.Items>
+                    <x:String>Limpiar Orden</x:String>
+                    <x:String>Más likes</x:String>
+                    <x:String>Menos likes</x:String>
+                    <x:String>Mayor tiempo</x:String>
+                    <x:String>Menor tiempo</x:String>
+                </Picker.Items>
+            </Picker>
+
+            <CollectionView ItemsSource="{Binding ListRecipes}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BorderColor="White"
+                           CornerRadius="15"
+                           BackgroundColor="Transparent"
+                           Margin="10"
+                           Padding="15"
+                           MaximumHeightRequest="300">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnTapped" CommandParameter="{Binding Id}" />
+                            </Frame.GestureRecognizers>
+                            <Grid ColumnDefinitions="*, 200" RowDefinitions="*, *, *">
+                                <Image Source="{Binding MainImage}" MaximumHeightRequest="70" HorizontalOptions="Start" Grid.Column="0" Grid.RowSpan="3"/>
+                                <Label Text="{Binding Title}" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalTextAlignment="End"  Grid.Column="1" Grid.Row="0"/>
+                                <Label Text="{Binding Time}" TextColor="White" FontSize="15" HorizontalTextAlignment="End" VerticalTextAlignment="End" Grid.Column="1" Grid.Row="1"/>
+                                <Label Text= "{Binding Username}" TextColor="White" FontSize="18" HorizontalTextAlignment="End" FontAttributes="Italic" Grid.Column="1" Grid.Row="2"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

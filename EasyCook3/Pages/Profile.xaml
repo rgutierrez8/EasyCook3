@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EasyCook3.Pages.Profile"
+             Title="Profile">
+    
+    <ScrollView>
+        <StackLayout Padding="0">
+            <Image x:Name="imgBanner" Background="White" />
+            <Frame Margin="0,-75"
+                   BorderColor="Black"
+                   CornerRadius="140"
+                   HeightRequest="150"
+                   WidthRequest="150"
+                   IsClippedToBounds="True"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center">
+                <Image Source="{Binding Userdto.Pic}"
+                         Aspect="AspectFill"
+                         Margin="-20"
+                         HeightRequest="190"
+                         WidthRequest="190" />
+            </Frame>
+            <StackLayout Spacing="20" Margin="35, 110">
+                <Label Text="{Binding Userdto.Username}" TextColor="White" HorizontalTextAlignment="Center" FontSize="30" FontAttributes="Bold, Italic"/>
+                <Grid ColumnDefinitions="85, 10, Auto" Margin="0, 30, 0, 10">
+                    <Label Text="Nombre: " TextColor="White" FontAttributes="Bold" FontSize="18" Grid.Column="0"/>
+                    <Label Text="{Binding Userdto.Name}" TextColor="White" FontAttributes="Italic" FontSize="15" Grid.Column="2"/>
+                </Grid>
+                <Grid ColumnDefinitions="85, 10, Auto" Margin="0, 0, 0, 10">
+                    <Label Text="Apellido: " TextColor="White" FontAttributes="Bold" FontSize="18" Grid.Column="0"/>
+                    <Label Text="{Binding Userdto.LastName}" TextColor="White" FontAttributes="Italic" FontSize="15" Grid.Column="2"/>
+                </Grid>
+                <Grid ColumnDefinitions="85, 10, Auto" Margin="0, 0, 0, 10">
+                    <Label Text="Email: " TextColor="White" FontAttributes="Bold" FontSize="18" Grid.Column="0" />
+                    <Label Text="{Binding Userdto.Email}" TextColor="White" FontAttributes="Italic" FontSize="15" Grid.Column="2"/>
+                </Grid>
+                <Grid ColumnDefinitions="85, 10, Auto" Margin="0, 0, 0, 10">
+                    <Label Text="Recetas: " TextColor="White" FontAttributes="Bold" FontSize="18" Grid.Column="0"/>
+                    <Label Text="{Binding Userdto.CountRecipes}" TextColor="White" FontAttributes="Italic" FontSize="15" Grid.Column="2"/>
+                </Grid>
+
+                <Button x:Name="btnAddRecipe"
+                        Text="Agregar nueva receta" 
+                        TextColor="White" 
+                        Background="Transparent" 
+                        BorderColor="White" 
+                        BorderWidth="1" 
+                        CornerRadius="25" 
+                        Margin="10,15"
+                        Clicked="OnClicked">
+                </Button>
+                
+            </StackLayout>
+            <CollectionView ItemsSource="{Binding Userdto.Recipes}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BorderColor="White"
+                               CornerRadius="15"
+                               BackgroundColor="Transparent"
+                               Margin="10"
+                               Padding="15"
+                               MaximumHeightRequest="300">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnTapped" CommandParameter="{Binding Id}" />
+                            </Frame.GestureRecognizers>
+                            <Grid ColumnDefinitions="*, 200" RowDefinitions="*, *, *">
+                                <Image Source="{Binding MainImage}" MaximumHeightRequest="70" HorizontalOptions="Start" Grid.Column="0" Grid.RowSpan="3"/>
+                                <Label Text="{Binding Title}" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalTextAlignment="End"  Grid.Column="1" Grid.Row="0"/>
+                                <Label Text="{Binding Time}" TextColor="White" FontSize="15" HorizontalTextAlignment="End" VerticalTextAlignment="End" Grid.Column="1" Grid.Row="1"/>
+                                <Label Text= "{Binding Username}" TextColor="White" FontSize="18" HorizontalTextAlignment="End" FontAttributes="Italic" Grid.Column="1" Grid.Row="2"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

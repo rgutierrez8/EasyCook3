@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:EasyCook3.ViewModels"
+             x:Class="EasyCook3.Pages.RecipeDetails"
+             Title="Recipe">
+    <ScrollView Margin="5">
+        <FlexLayout Padding="55"
+                    Direction="Column">
+            <Label Text="Detalles de la Receta"
+               FontSize="20" 
+               Margin="15"
+               FontAttributes="Bold"/>
+            <BoxView Color="Gray"
+                 HeightRequest="2"
+                 HorizontalOptions= "Start"
+                 WidthRequest="255"/>
+
+            <Grid>
+                <!-- Botón para Agregar a Favoritos -->
+                <Button x:Name="btnAddFav"
+                        Text="Agregar a Favoritos" 
+                        TextColor="White" 
+                        Background="Transparent" 
+                        BorderColor="White" 
+                        BorderWidth="1" 
+                        CornerRadius="25" 
+                        Margin="10,15"
+                        Clicked="OnClickedAddFav"
+                        CommandParameter="{Binding RecipeDetail.Id}">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding RecipeDetail.InFav}" Value="True">
+                            <Setter Property="IsVisible" Value="False" />
+                            <Setter Property="Opacity" Value="0" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Button" Binding="{Binding RecipeDetail.InFav}" Value="False">
+                            <Setter Property="IsVisible" Value="True" />
+                            <Setter Property="Opacity" Value="1" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <!--Botón para Quitar de Favoritos -->
+                <Button x:Name="btnDelFav"
+                        Text="Quitar de Favoritos" 
+                        TextColor="White" 
+                        Background="Green" 
+                        BorderColor="White" 
+                        BorderWidth="1" 
+                        CornerRadius="25" 
+                        Margin="10,15"
+                        Clicked="OnClickedDeleteFav"
+                        CommandParameter="{Binding RecipeDetail.Id}">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding RecipeDetail.InFav}" Value="True">
+                            <Setter Property="IsVisible" Value="True" />
+                            <Setter Property="Opacity" Value="1" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Button" Binding="{Binding RecipeDetail.InFav}" Value="False">
+                            <Setter Property="IsVisible" Value="False" />
+                            <Setter Property="Opacity" Value="0" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </Grid>
+
+            <StackLayout x:Name="stackCards"
+                     Spacing="5"
+                     Margin="15">
+                <CarouselView IndicatorView="indicatorView" x:Name="carousel">
+                    <CarouselView.ItemTemplate>
+                        <DataTemplate>
+                            <VerticalStackLayout Padding="5" HeightRequest="200" x:Name="dataImgTemplate">
+                                <Image Source="{Binding .}" HeightRequest="200" Aspect="AspectFit"></Image>
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </CarouselView.ItemTemplate>
+                </CarouselView>
+                <IndicatorView x:Name="indicatorView" Margin="5" HorizontalOptions="Center">
+                </IndicatorView>
+                <Label x:Name="lblUser" Text="{Binding RecipeDetail.Username}" FontSize="15" FontAttributes="Italic" Margin="40, 10"/>
+                <Label x:Name="lblTitle" Text="{Binding RecipeDetail.Title}" FontSize="Medium" FontAttributes="Bold" Margin="5"/>
+                <Label x:Name="lblTime" Text="{Binding RecipeDetail.Time}" FontSize="15" FontAttributes="Italic" Margin="7, -4, 0, 10"/>
+                <StackLayout Margin="10,5" HorizontalOptions="Center" Orientation="Horizontal" Spacing="5">
+                    <Button Text="INGREDIENTES" FontSize="Medium" Background="Green" TextColor="White" BorderColor="White" BorderWidth="2" 
+                            x:Name="btnIng" Clicked="onBtnIngClick" />
+                    <Button Text="PROCEDIMIENTO" FontSize="Medium" Background="Transparent" TextColor="White" BorderColor="White" BorderWidth="2" 
+                            x:Name="btnProc" Clicked="onBtnProcClick"/>
+                </StackLayout>
+
+                <Grid>
+                    <Frame x:Name="IngredFrame" BorderColor="Gray"
+                            CornerRadius="20"
+                            Padding="15"
+                            Margin="10"
+                            Background="Transparent"
+                            MinimumHeightRequest="350">
+                        <StackLayout  VerticalOptions="Center">
+                            <ListView ItemsSource="{Binding RecipeDetail.ListIngredients}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <ViewCell>
+                                            <Grid ColumnDefinitions="20,2*,*,20" Margin="0, 10">
+                                                <Label Text="{Binding IngredientName}" TextColor="White" Grid.Column="1" />
+                                                <Label Text="{Binding Amount}" TextColor="White" Grid.Column="2"/>
+                                            </Grid>
+                                        </ViewCell>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackLayout>
+                    </Frame>
+                    <Frame x:Name="StepsFrame" BorderColor="Gray"
+                            CornerRadius="20"
+                            Padding="15"
+                            Margin="10"
+                            Background="Transparent"
+                            MinimumHeightRequest="350">
+                        <StackLayout  VerticalOptions="Center">
+                            <ListView ItemsSource="{Binding RecipeDetail.ListSteps}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <ViewCell>
+                                            <Grid ColumnDefinitions="10, *, 4*, 10" Padding="0, 0">
+                                                <Label Text="{Binding NumberStep}" TextColor="White" Margin="5, 0, 10, 0" Grid.Column="1" Padding="0,10"/>
+                                                <Label Text="{Binding Description}" TextColor="White" Grid.Column="2"/>
+                                            </Grid>
+                                        </ViewCell>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackLayout>
+                    </Frame>
+                </Grid>
+
+                <Label Text="Comentarios" TextColor="White" FontAttributes="Bold" FontSize="20" TextDecorations="Underline" HorizontalTextAlignment="Center" Margin="0, 25"/>
+                <CollectionView x:Name="CollectionView" ItemsSource="{Binding RecipeDetail.CommentList}" HorizontalOptions="Center">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame BorderColor="Gray"
+                                    CornerRadius="20"
+                                    Padding="15"
+                                    Margin="10"
+                                    Background="#607F7F7F">
+                                <StackLayout>
+                                    <Grid>
+                                        <Label Text="{Binding Username}" TextColor="White" FontSize="20" FontAttributes="Bold" />
+                                        <Label Text="{Binding Date}" TextColor="White" FontSize="16" Margin="10, 0" HorizontalTextAlignment="End"/>
+                                    </Grid>
+                                    <Label Text="{Binding Description}" TextColor="White" FontSize="18" Margin="0, 15" FontAttributes="Italic"/>
+                                </StackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+
+        </FlexLayout>
+        
+    </ScrollView>
+</ContentPage>
