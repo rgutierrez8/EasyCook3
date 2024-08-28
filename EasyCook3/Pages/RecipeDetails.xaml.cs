@@ -92,6 +92,5 @@ public partial class RecipeDetails : ContentPage
         }
 
         return parameter;
-
     }
 }
