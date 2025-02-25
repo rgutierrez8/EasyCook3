@@ -15,7 +15,8 @@ public partial class Liked : ContentPage
 		InitializeComponent();
 
 		_viewModel = MauiProgram.CreateMauiApp().Services.GetService<FavsVM>();
-		BindingContext = _viewModel;
+        NavigationPage.SetHasNavigationBar(this, false);
+        BindingContext = _viewModel;
 	}
 
 	public async void OnTapped(object sender, EventArgs e)
@@ -31,4 +32,16 @@ public partial class Liked : ContentPage
             }
         }
 	}
+
+    protected override async void OnNavigatedTo(NavigatedToEventArgs args)
+    {
+        base.OnNavigatedTo(args);
+
+        var viewModel = BindingContext as FavsVM;
+        if (viewModel != null)
+        {
+            await viewModel.RefreshRecipes();
+        }
+    }
+
 }

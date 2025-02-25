@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<popup:BasePopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                     xmlns:popup="clr-namespace:MauiPopup.Views;assembly=MauiPopup"
+                     x:Class="EasyCook3.PopUps.NewUserPopup"
+                     Title="NewUserPopup">
+    <VerticalStackLayout Padding="20"
+                         WidthRequest="380"
+                         HeightRequest="600">
+        <Entry x:Name="NameEntry"
+               Placeholder="Nombre"
+               FontSize="18"
+               TextColor="White"
+               Margin="0, 10"/>
+        <Entry x:Name="LastNameEntry"
+               Placeholder="Apellido"
+               FontSize="18" 
+               TextColor="White"
+               Margin="0, 10"/>
+        <Entry x:Name="EmailEntry"
+               Placeholder="Email"
+               FontSize="18" 
+               TextColor="White"
+               Margin="0, 10"/>
+        <Entry x:Name="UserEntry"
+               Placeholder="Nombre"
+               FontSize="18" 
+               TextColor="White"
+               Margin="0, 10"/>
+        <Entry x:Name="PassEntry"
+               Placeholder="Password"
+               FontSize="18" 
+               IsPassword="True"
+               TextColor="White"
+               Margin="0, 10"/>
+        <Grid Padding="10"
+              Margin="0, 10"
+              ColumnDefinitions="3*, *">
+            <Button Text="Explorar" 
+                    Clicked="OnPickFileClicked"
+                    WidthRequest="90"
+                    HorizontalOptions="End"
+                    VerticalOptions="Fill"
+                    HeightRequest="40"
+                    Grid.Column="1"/>
+            <Entry x:Name="FilePicLabel" 
+                   Placeholder="Imágen de perfil" 
+                   Text=""
+                   IsReadOnly="True" 
+                   TextColor="White"
+                   FontSize="18"
+                   Grid.Column="0"
+                   HorizontalTextAlignment="Center"/>
+        </Grid>
+        <Grid Padding="10"
+              Margin="0, 10"
+              ColumnDefinitions="3*, *">
+            <Button Text="Explorar" 
+                    Clicked="OnPickFileClickedBanner"
+                    WidthRequest="90"
+                    HorizontalOptions="End"
+                    VerticalOptions="Fill"
+                    HeightRequest="40"
+                    Grid.Column="1"/>
+            <Entry x:Name="FileBannerLabel" 
+                   Placeholder="Banner" 
+                   Text=""
+                   IsReadOnly="True" 
+                   TextColor="White"
+                   FontSize="18"
+                   Grid.Column="0"
+                   HorizontalTextAlignment="Center"/>
+        </Grid>
+        <Grid ColumnDefinitions="*,10,*" Margin="0, 25">
+            <Button Text="Registrarse"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    Background="Green"
+                    BorderColor="White"
+                    Grid.Column="2"
+                    Clicked="OnAccept"/>
+            <Button Text="Cancelar"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    Background="Red"
+                    BorderColor="White"
+                    Grid.Column="0"
+                    Clicked="OnCancel"/>
+        </Grid>
+    </VerticalStackLayout>
+</popup:BasePopupPage>

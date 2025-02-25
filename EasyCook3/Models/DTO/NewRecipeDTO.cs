@@ -9,12 +9,14 @@ namespace EasyCook3.Models.DTO
     public class NewRecipeDTO
     {
         public string Title { get; set; }
-        public string Description { get; set; }
-        public string MainImage { get; set; }
-        public string Img2 { get; set; }
-        public string Img3 { get; set; }
-        public string Img4 { get; set; }
-        public string Time { get; set; }
+        public string Describe { get; set; }
+        public string NeededTime { get; set; }
+        public string? MainImage { get; set; }
+        public string? Img2 { get; set; }
+        public string? Img3 { get; set; }
+        public string? Img4 { get; set; }
+        public List<IngredientsDTO> Ingredients { get; set; }
+        public List<StepDTO> Steps { get; set; }
 
     }
 }

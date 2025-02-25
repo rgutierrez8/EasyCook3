@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using EasyCook3.Core.Interfaces;
 using EasyCook3.Core;
+using EasyCook3.Pages;
 
 namespace EasyCook3.ViewModels
 {
@@ -41,24 +42,12 @@ namespace EasyCook3.ViewModels
             _userService = userService;
             _recipeService = recipeService;
 
+            WaitResult();
+        }
 
-            User user = userService.GetUser(6);
-
-            if (user != null)
-            {
-                Userdto = new UserDTO()
-                {
-                    Id = user.Id,
-                    Name = user.Name,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    Username = user.Username,
-                    Pic = user.Pic,
-                    Banner = user.Banner,
-                    CountRecipes = _recipeService.GetRecipesByUser(user.Id).Count,
-                    Recipes = _recipeService.GetRecipesByUser(user.Id),
-                };
-            }
+        public async void WaitResult()
+        {
+            Userdto = await _userService.GetUser();
         }
     }
 }

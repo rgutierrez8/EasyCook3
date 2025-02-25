@@ -5,12 +5,15 @@ using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Newtonsoft.Json;
+using System.Text;
+using EasyCook3.Data;
 
 namespace EasyCook3.Pages;
 
 public partial class NewRecipe : ContentPage
 {
     private readonly IConfiguration _configuration;
+    private readonly ApiService _apiService;
 
     List<FileResult> list = new List<FileResult>();
     List<string> ListImg = new List<string>();
@@ -18,12 +21,14 @@ public partial class NewRecipe : ContentPage
     FileResult Img2;
     FileResult Img3;
     FileResult Img4;
+    string img1Converted, img2Converted, img3Converted, img4Converted;
     private int countEntries = 4;
     private int countStepEntries = 4;
-    public NewRecipe(IConfiguration configuration)
-	{
-		InitializeComponent();
+    public NewRecipe(IConfiguration configuration, ApiService apiService)
+    {
+        InitializeComponent();
         _configuration = configuration;
+        _apiService = apiService;
 
         Img1 = null;
         Img2 = null;
@@ -57,29 +62,34 @@ public partial class NewRecipe : ContentPage
             var result = await FilePicker.Default.PickAsync(new PickOptions
             {
                 PickerTitle = "Por favor selecciona un archivo",
-                FileTypes = FilePickerFileType.Images // Puedes especificar los tipos de archivos permitidos
+                FileTypes = FilePickerFileType.Images 
             });
 
             if (result != null)
             {
-                if (img == 1) 
-                { 
-                    FileNameLabel.Text = $"{result.FileName}"; 
+                if (img == 1)
+                {
+                    FileNameLabel.Text = $"{result.FileName}";
                     Img1 = result;
+                    img1Converted = await ConvertToBase64(result);
                 }
-                if (img == 2) 
-                { 
-                    FileNameLabelImg2.Text = $"{result.FileName}"; 
+                if (img == 2)
+                {
+                    FileNameLabelImg2.Text = $"{result.FileName}";
                     Img2 = result;
+                    img2Converted = await ConvertToBase64(result);
                 }
-                if (img == 3) 
-                { 
-                    FileNameLabelImg3.Text = $"{result.FileName}"; 
+                if (img == 3)
+                {
+                    FileNameLabelImg3.Text = $"{result.FileName}";
                     Img3 = result;
+                    img3Converted = await ConvertToBase64(result);
                 }
-                if (img == 4) { 
-                    FileNameLabelImg4.Text = $"{result.FileName}"; 
+                if (img == 4)
+                {
+                    FileNameLabelImg4.Text = $"{result.FileName}";
                     Img4 = result;
+                    img4Converted = await ConvertToBase64(result);
                 }
             }
         }
@@ -89,43 +99,17 @@ public partial class NewRecipe : ContentPage
         }
     }
 
-    public async Task LoadPicker()
+    public async Task<string> ConvertToBase64(FileResult img)
     {
-        var urlImgBB = "https://api.imgbb.com/1/upload?key=" + _configuration["Settings:imgBB_ApiKey"];
+        string base64Image;
+        var stream = await img.OpenReadAsync();
 
-        foreach (var result in list)
+        using (var memoryStream = new MemoryStream())
         {
-            if (result != null)
-            {
-                try
-                {
-                    using var stream = await result.OpenReadAsync();
-                    var content = new MultipartFormDataContent();
-                    var imageContent = new StreamContent(stream);
-                    imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-                    content.Add(imageContent, "image", result.FileName);
-
-                    using var client = new HttpClient();
-                    var response = await client.PostAsync(urlImgBB, content);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseContent = await response.Content.ReadAsStringAsync();
-                        var JsonResult = JsonConvert.DeserializeObject<dynamic>(responseContent);
-                        ListImg.Add(JsonResult.data.image.url.ToString());
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"Error al subir la imagen: {response.ReasonPhrase}");
-                        Console.WriteLine(errorContent);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-        }
+            await stream.CopyToAsync(memoryStream);
+            var imageBytes = memoryStream.ToArray();
+            return base64Image = Convert.ToBase64String(imageBytes);
+        };
     }
 
     #endregion
@@ -172,12 +156,12 @@ public partial class NewRecipe : ContentPage
     {
         List<IngredientsDTO> ingredientsDTOs = new List<IngredientsDTO>();
 
-        foreach (var grid  in StackIngs.Children.OfType<Grid>().ToList())
+        foreach (var grid in StackIngs.Children.OfType<Grid>().ToList())
         {
             var entryIng = grid.Children[0] as Entry;
             var entryAmount = grid.Children[1] as Entry;
 
-            if(String.IsNullOrWhiteSpace(entryIng.Text) || String.IsNullOrWhiteSpace(entryAmount.Text))
+            if (String.IsNullOrWhiteSpace(entryIng.Text) || String.IsNullOrWhiteSpace(entryAmount.Text))
             {
                 break;
             }
@@ -217,8 +201,8 @@ public partial class NewRecipe : ContentPage
     {
         var stepNumber = 1;
         List<StepDTO> StepDTOs = new List<StepDTO>();
-       
-        foreach(var item  in StackSteps.Children.OfType<Editor>().ToList())
+
+        foreach (var item in StackSteps.Children.OfType<Editor>().ToList())
         {
 
             if (String.IsNullOrWhiteSpace(item.Text))
@@ -229,10 +213,10 @@ public partial class NewRecipe : ContentPage
             StepDTO step = new StepDTO()
             {
                 NumberStep = stepNumber,
-                Description = item.Text,
+                Describe = item.Text,
             };
 
-            StepDTOs.Add(step); 
+            StepDTOs.Add(step);
             stepNumber++;
         }
 
@@ -245,18 +229,9 @@ public partial class NewRecipe : ContentPage
 
     public async void OnClickSave(object sender, EventArgs e)
     {
-        ListImg.Clear();
-        list.Clear();
 
         var listIngredients = GetIngredients();
         var listSteps = GetSteps();
-
-        if(Img1 != null) list.Add(Img1);
-        if(Img2 != null) list.Add(Img2);
-        if(Img3 != null) list.Add(Img3);
-        if(Img4 != null) list.Add(Img4);
-
-        await LoadPicker();
 
         var title = EntryTitle.Text;
         var description = EntryDescription.Text;
@@ -267,17 +242,34 @@ public partial class NewRecipe : ContentPage
             NewRecipeDTO recipe = new NewRecipeDTO()
             {
                 Title = title,
-                Description = description,
-                Time = time,
-                MainImage =  1 <= ListImg.Count ? ListImg[0] : null,
-                Img2 = 2 <= ListImg.Count ? ListImg[1] : null,
-                Img3 = 3 <= ListImg.Count ? ListImg[2] : null,
-                Img4 = 4 <= ListImg.Count ? ListImg[3] : null
+                Describe = description,
+                NeededTime = time,
+                MainImage = !string.IsNullOrEmpty(img1Converted) ? img1Converted : null,
+                Img2 = !string.IsNullOrEmpty(img2Converted) ? img2Converted : null,
+                Img3 = !string.IsNullOrEmpty(img3Converted) ? img3Converted : null,
+                Img4 = !string.IsNullOrEmpty(img4Converted) ? img4Converted : null,
+                Ingredients = listIngredients,
+                Steps = listSteps,
             };
+
+            var json = System.Text.Json.JsonSerializer.Serialize(recipe);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _apiService.PostAsync("Recipes/New", content);
+            if (response.IsSuccessStatusCode)
+            {
+                await DisplayAlert("Éxito", "Datos cargados correctamente", "OK");
+                await Navigation.PopModalAsync();
+            }
+            else
+            {
+                await DisplayAlert("Error", "No se pudo subir la imagen", "OK");
+            }
         }
+
     }
 
-    public async void OnClickCancel(object sender, EventArgs e) 
+    public async void OnClickCancel(object sender, EventArgs e)
     {
         await Navigation.PopModalAsync();
     }

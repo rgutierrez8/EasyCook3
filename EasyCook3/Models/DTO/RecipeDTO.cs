@@ -13,14 +13,14 @@ namespace EasyCook3.Models.DTO
     {
         public int Id { get; set; }
         public string Title { get; set; }
-        public string Description { get; set; }
+        public string Describe { get; set; }
         public List<IngredientsDTO> ListIngredients { get; set; }
         public List<StepDTO> ListSteps { get; set; }
         public string MainImage { get; set; }
         public string Img2 { get; set; }
         public string Img3 { get; set; }
         public string Img4 { get; set; }
-        public string Time { get; set; }
+        public string NeededTime { get; set; }
         public string Username { get; set; }
         public int Like { get; set; }
         public int dontLike { get; set; }

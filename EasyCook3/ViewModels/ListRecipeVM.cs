@@ -1,4 +1,6 @@
-﻿using EasyCook3.Core.Interfaces;
+﻿using EasyCook3.Core.Helpers;
+using EasyCook3.Core.Interfaces;
+using EasyCook3.Data;
 using EasyCook3.Models;
 using EasyCook3.Models.DTO;
 using System;
@@ -14,6 +16,8 @@ namespace EasyCook3.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
         private readonly IRecipeService _recipeService;
+        private readonly Mapper _mapper;
+        private readonly MySQLiService _mydb;
 
         private int _order;
         public int Order
@@ -27,6 +31,17 @@ namespace EasyCook3.ViewModels
                     OnPropertyChanged(nameof(Order));
                     UpdateListRecipes(_order);
                 }
+            }
+        }
+
+        private bool _isLoading;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged(nameof(IsLoading));
             }
         }
 
@@ -50,15 +65,73 @@ namespace EasyCook3.ViewModels
 
         public ListRecipeVM(IRecipeService recipeService)
         {
+            IsLoading = true;
+            var serviceProvider = MauiProgram.CreateMauiApp().Services;
+            _mapper = serviceProvider.GetService<Mapper>();
             _recipeService = recipeService;
+            _mydb = serviceProvider.GetService<MySQLiService>();
 
-            ListRecipes = _recipeService.GetAll(_order);
-            UpdateListRecipes(_order);
+            if (CheckConnectivity())
+            {
+                try
+                {
+                    Init();
+                }
+                finally
+                {
+                    IsLoading = false;
+                }
+            }
+            else
+            {
+                try
+                {
+                    InitOffline();
+                }
+                finally
+                {
+                    IsLoading = false;
+                }
+            }
+
         }
 
-        public void UpdateListRecipes(int order)
+        public async void Init()
         {
-            ListRecipes = _recipeService.GetAll(order);
+            ListRecipes = await _recipeService.GetAll(_order);
+            UpdateListRecipes(_order);
+        }
+        public async Task InitOffline()
+        {
+            var lisDTO = new List<RecipesListDTO>();
+            var data = await _mydb.GetRecipesAsync();
+
+            ListRecipes = _mapper.MapRecipeToRecipesListDTO(data);
+        }
+
+        public async void UpdateListRecipes(int order)
+        {
+            IsLoading = true;
+            try
+            {
+                ListRecipes = await _recipeService.GetAll(order);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        public bool CheckConnectivity()
+        {
+            var Current = Connectivity.Current;
+
+            if (Current.NetworkAccess == NetworkAccess.Internet)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

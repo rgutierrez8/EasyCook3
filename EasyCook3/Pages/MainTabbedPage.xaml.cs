@@ -8,6 +8,8 @@ public partial class MainTabbedPage : TabbedPage
     {
         InitializeComponent();
 
+        NavigationPage.SetHasBackButton(this, false);
+
         var home = new MainPage()
         {
             //Title = "Home",

@@ -2,26 +2,49 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="EasyCook3.Pages.Login"
-             Title="">
-    <VerticalStackLayout VerticalOptions="Center"
-                         Padding="40">
-        <Entry x:Name="UserEntry"
-               Placeholder="Usuario"
-               TextColor="White"
-               FontSize="18"
-               Margin="10,20" />
-        <Entry x:Name="PasswordEntry"
-               Placeholder="Password"
-               IsPassword="True"
-               TextColor="White"
-               FontSize="18"
-               Margin="10,20" />
-        <Button Text="Ingresar"
-                TextColor="White"
-                FontSize="18"
-                CornerRadius="15"
-                Background="Green"
-                Margin="30,20" 
-                Clicked="OnClick"/>
-    </VerticalStackLayout>
+             Padding="0">
+    <Grid>
+        <Image Source="EasyCook_splashart2.webp"
+           Aspect="AspectFill"
+           Opacity="0.6"
+           Grid.Row="0" Grid.Column="0"
+           HorizontalOptions="FillAndExpand"
+           VerticalOptions="FillAndExpand"/>
+        <VerticalStackLayout VerticalOptions="Center"
+                             Padding="40">
+            <Frame BackgroundColor="#9D000000"
+                   CornerRadius="15">
+                <StackLayout>
+                    <Entry x:Name="UserEntry"
+                           Placeholder="Usuario"
+                           PlaceholderColor="White"
+                           TextColor="White"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           Margin="10,20" />
+                    <Entry x:Name="PasswordEntry"
+                           Placeholder="Password"
+                           PlaceholderColor="white"
+                           FontAttributes="Bold"
+                           IsPassword="True"
+                           TextColor="White"
+                           FontSize="18"
+                           Margin="10,20" />
+                    <Button Text="Ingresar"
+                            TextColor="White"
+                            FontSize="18"
+                            CornerRadius="15"
+                            Background="Green"
+                            Margin="30,20" 
+                            Clicked="OnClick"/>
+
+                    <Label x:Name="newUser" Text="Nuevo Usuario" TextColor="White" FontAttributes="Bold,Italic" FontSize="20" HorizontalTextAlignment="Center" >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnClickedNew" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </StackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </Grid>
 </ContentPage>

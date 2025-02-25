@@ -9,6 +9,6 @@ namespace EasyCook3.Core.Interfaces
 {
     public interface ICommentService
     {
-        public List<CommentDTO> GetComments(int recipeId);
+        Task<bool> NewComment(NewCommentDTO comment);
     }
 }

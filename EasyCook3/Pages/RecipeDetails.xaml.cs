@@ -6,23 +6,46 @@ using EasyCook3.Models.DTO;
 //using static Kotlin.Jvm.Internal.Ref;
 using System.Net.NetworkInformation;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Runtime.CompilerServices;
+using Microsoft.Maui.Controls.Compatibility;
+using MauiPopup;
+using EasyCook3.PopUps;
+using EasyCook3.Data;
 
 namespace EasyCook3.Pages;
 
 public partial class RecipeDetails : ContentPage
-{	
+{
+    private readonly IFavService _favService;
+    private readonly IRecipeService _recipeService;
+    private readonly RecipeVM _recipeVM;
+    private readonly FavsVM _favVM;
+    private readonly MySQLiService _mydb;
+
+    public int _recipeId;
     public RecipeDetails(int recipeId)
 	{
 		InitializeComponent();
+        NavigationPage.SetHasNavigationBar(this, false);
 
         var serviceProvider = MauiProgram.CreateMauiApp().Services;
-        var recipeService = serviceProvider.GetRequiredService<IRecipeService>();
-        var favService = serviceProvider.GetRequiredService<IFavService>();
+        _recipeService = serviceProvider.GetRequiredService<IRecipeService>();
+        _favService = serviceProvider.GetRequiredService<IFavService>();
         var userService = serviceProvider.GetRequiredService<IUserService>();
-        RecipeVM recipeVM = new RecipeVM(recipeId, recipeService, favService, userService);
+        _recipeVM = new RecipeVM(_recipeService, _favService, userService);
+        _favVM = serviceProvider.GetService<FavsVM>();
+        _mydb = serviceProvider.GetService<MySQLiService>();
 
-        BindingContext = recipeVM;
+        _recipeId = recipeId;
+        BindingContext = _recipeVM;
 
+        LoadRecipeData(_recipeVM, recipeId);
+
+    }
+
+    public async void LoadRecipeData(RecipeVM recipeVM, int recipeId)
+    {
+        await recipeVM.LoadRecipe(recipeId);
 
         #region AGREGAR IMAGENES AL CARRUSEL
 
@@ -59,27 +82,53 @@ public partial class RecipeDetails : ContentPage
         IngredFrame.Opacity = 0;
     }
 
-    public void OnClickedAddFav(object sender, EventArgs args)
+    public async void OnClickedAddFav(object sender, EventArgs args)
     {
-        btnDelFav.Opacity = 1;
-        btnDelFav.IsVisible = true;
-        btnAddFav.Opacity = 0;
-        btnAddFav.IsVisible = false;
-
         var id = GetCommandParamenter(sender);
 
-        // FALTA HACER FUNCION PARA AGREGAR A FAVORITOS
+        FavDTO fav = new FavDTO()
+        {
+            RecipeId = id,
+        };
+
+        var response = await FavTask(method: "new", fav: fav);
+
+        if(response)
+        {
+            AddRecipeMySQLi(id);
+            LoadRecipeData(_recipeVM, id);
+        }
     }
-    public void OnClickedDeleteFav(object sender, EventArgs args)
+
+    public async void OnClickedDeleteFav(object sender, EventArgs args)
     {
-        btnAddFav.Opacity = 1;
-        btnAddFav.IsVisible = true;
-        btnDelFav.Opacity = 0;
-        btnDelFav.IsVisible = false;
-
         var id = GetCommandParamenter(sender);
+        FavDTO fav = new FavDTO()
+        {
+            RecipeId = id,
+        };
 
-        // FALTA HACER FUNCION PARA ELIMINAR DE FAVORITOS
+        var response = await FavTask(method: "del", fav: fav);
+
+        if (response)
+        {
+            DeleteRecipeMySQLi(id);
+            MessagingCenter.Send(this, "UpdateFav");
+            _favVM.RefreshRecipes();
+            LoadRecipeData(_recipeVM, id);
+        }
+    }
+
+    public async Task<bool> FavTask(string method, FavDTO fav)
+    {
+        if (method == "new")
+        {
+            return await _favService.NewFav(fav);
+        }
+        else
+        {
+            return await _favService.DeleteFav(fav);
+        }
     }
 
     public int GetCommandParamenter(object sender)
@@ -93,4 +142,79 @@ public partial class RecipeDetails : ContentPage
 
         return parameter;
     }
+
+    public async void OnAddComment(object sender, EventArgs args)
+    {
+        await PopupAction.DisplayPopup(new NewCommentPopup(_recipeId));
+        LoadRecipeData(_recipeVM, _recipeId);
+    }
+
+    public async void AddRecipeMySQLi(int id)
+    {
+        if (!await _mydb.FinRecipeById(id))
+        {
+            var item = await _recipeService.GetRecipe(id);
+
+            Recipe recipeCopy = new Recipe()
+            {
+                Id = item.Id,
+                Title = item.Title,
+                Descripe = item.Describe,
+                MainImage = item.MainImage,
+                Img2 = item.Img2,
+                Img3 = item.Img3,
+                Img4 = item.Img4,
+                NeededTime = item.NeededTime,
+                Username = item.Username,
+                Like = item.Like,
+                DontLike = item.dontLike
+            };
+
+            foreach (var item2 in item.ListIngredients)
+            {
+                Ingredient ingredient = new Ingredient()
+                {
+                    Id = item.Id,
+                    Amount = item2.Amount,
+                    IngredientName = item2.IngredientName
+                };
+
+                await _mydb.AddIngredientAsync(ingredient);
+            }
+
+            foreach (var item3 in item.ListSteps)
+            {
+                Step step = new Step()
+                {
+                    Id = item.Id,
+                    NumberStep = item3.NumberStep,
+                    Description = item3.Describe
+                };
+
+                await _mydb.AddStepAsync(step);
+            }
+
+            foreach (var item4 in item.CommentList)
+            {
+                Comment comment = new Comment()
+                {
+                    RecipeId = item.Id,
+                    Username = item4.Username,
+                    Description = item4.Describe
+                };
+
+                await _mydb.AddCommentAsync(comment);
+            }
+
+            await _mydb.AddRecipeAsync(recipeCopy);
+        }
+    }
+    public async void DeleteRecipeMySQLi(int id)
+    {
+        _mydb.DeleteRecipe(id);
+        _mydb.DeleteIngredient(id);
+        _mydb.DeleteSteps(id);
+        _mydb.DeleteComment(id);
+    }
+
 }

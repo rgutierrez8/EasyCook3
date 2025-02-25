@@ -10,6 +10,7 @@ namespace EasyCook3
         public MainPage()
         {
             InitializeComponent();
+            NavigationPage.SetHasNavigationBar(this, false);
             _viewModel = MauiProgram.CreateMauiApp().Services.GetService<ListRecipeVM>();
             BindingContext = _viewModel;
         }

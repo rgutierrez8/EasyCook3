@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<popup:BasePopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                     xmlns:popup="clr-namespace:MauiPopup.Views;assembly=MauiPopup"
+                     x:Class="EasyCook3.PopUps.NewCommentPopup"
+                     Title="NewCommentPopup">
+    <VerticalStackLayout Background="Transparent">
+        <Frame CornerRadius="15"
+               BorderColor="White"
+               Background="Black"
+               WidthRequest="350">
+            <StackLayout>
+                <Label 
+                    Text="Nuevo comentario"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    Margin="10"
+                    VerticalOptions="Center" />
+                <Editor x:Name="newComment" 
+                        TextColor="White"
+                        Placeholder="Escribir aquí..."
+                        FontSize="16"
+                        FontAttributes="Italic"
+                        HeightRequest="100"/>
+                <Grid ColumnDefinitions="*,10,*"
+                      Margin="10">
+                    <Button Text="Aceptar"
+                            TextColor="White"
+                            Background="Green"
+                            WidthRequest="100"
+                            HeightRequest="50"
+                            Grid.Column="0"
+                            Clicked="OnSave"/>
+                    <Button Text="Cancelar"
+                            TextColor="White"
+                            Background="Red"
+                            WidthRequest="100"
+                            HeightRequest="50" 
+                            Grid.Column="2"
+                            Clicked="OnCancel"/>
+                </Grid>
+            </StackLayout>
+        </Frame>
+    </VerticalStackLayout>
+</popup:BasePopupPage>

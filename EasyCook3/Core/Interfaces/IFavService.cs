@@ -12,5 +12,7 @@ namespace EasyCook3.Core.Interfaces
     {
         public List<Fav> GetFavs(int userId);
         public Boolean InFavs(int recipeId, int userId);
+        Task<bool> NewFav(FavDTO fav);
+        Task<bool> DeleteFav(FavDTO fav);
     }
 }

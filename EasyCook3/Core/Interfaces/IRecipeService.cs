@@ -10,9 +10,10 @@ namespace EasyCook3.Core.Interfaces
 {
     public interface IRecipeService
     {
-        public RecipeDTO GetRecipe (int id);
-        public List<RecipesListDTO> GetAll(int? order);
+        Task<RecipeDTO> GetRecipe (int id);
+        Task<List<RecipesListDTO>> GetAll(int? order);
         public List<RecipesListDTO> GetRecipesByUser (int userId);
-        public List<RecipesListDTO> GetFavsUser(List<Fav> favList);
+        Task<List<RecipesListDTO>> GetFavsUser();
+        Task<List<RecipeDTO>> GetAllInFav();
     }
 }

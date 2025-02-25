@@ -1,4 +1,6 @@
-﻿using EasyCook3.Core.Interfaces;
+﻿using EasyCook3.Core.Helpers;
+using EasyCook3.Core.Interfaces;
+using EasyCook3.Data;
 using EasyCook3.Models.DTO;
 using EasyCook3.Pages;
 using System;
@@ -17,13 +19,27 @@ namespace EasyCook3.ViewModels
         private readonly IRecipeService _recipeService;
         private readonly IFavService _favService;
         private readonly IUserService _userService;
-        
+        private readonly IMapper _mapper;
+        private readonly MySQLiService _mydb;
         private int _recipeId { get; set; }
+        
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        private bool _isLoading;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged(nameof(IsLoading));
+            }
+        }
+
 
         private RecipeDTO _recipe;
 
@@ -51,14 +67,70 @@ namespace EasyCook3.ViewModels
             }
         }
 
-        public RecipeVM(int recipeId, IRecipeService recipeService, IFavService favService, IUserService userService)
+
+        public RecipeVM(IRecipeService recipeService, IFavService favService, IUserService userService)
         {
+            var serviceProvider = MauiProgram.CreateMauiApp().Services;
+            _mapper = serviceProvider.GetService<IMapper>();
             _recipeService = recipeService;
-            _recipeId = recipeId;
             _favService = favService;
             _userService = userService;
+            _mydb = serviceProvider.GetService<MySQLiService>();
+        }
 
-            RecipeDetail = _recipeService.GetRecipe(recipeId);
+        public async Task LoadRecipe(int recipeId)
+        {
+            IsLoading = true;
+
+            if (CheckConnectivity())
+            {
+                try
+                {
+                    var data = await _recipeService.GetRecipe(recipeId);
+                    RecipeDetail = data;
+                }
+                finally
+                {
+                    IsLoading = false;
+                }
+            }
+            else
+            {
+                try
+                {
+                    var data = await GetRecipeFromMySQLi(recipeId);
+                    RecipeDetail = data;
+                }
+                finally
+                {
+                    IsLoading = false;
+                }
+            }
+        }
+
+        public async Task<RecipeDTO> GetRecipeFromMySQLi(int recipeId)
+        {
+            var users = await _mydb.GetAllUser();
+            var recipes = await _mydb.GetRecipesAsync();
+            var ingredients = await _mydb.getallingredient();
+            var steps = await _mydb.getallstep();
+            var coments = await _mydb.getallcomment();
+
+            var recipe = await _mapper.MapRecipeToRecipeDTO(await _mydb.ReturnRecipe(recipeId));
+
+            return recipe;
+        }
+
+        public bool CheckConnectivity()
+        {
+            var Current = Connectivity.Current;
+
+            if (Current.NetworkAccess == NetworkAccess.Internet)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

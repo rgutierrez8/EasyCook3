@@ -20,7 +20,7 @@
             <!--<Label Text="Datos Principales" 
            FontSize="20"
            HorizontalTextAlignment="Center"
-           Margin="0,20"
+           Margin="0,20"/>
             <StackLayout>
                 <Entry x:Name="EntryTitle"
                Placeholder="Título"
@@ -189,7 +189,7 @@
            FontSize="20"
            HorizontalTextAlignment="Center"
            Margin="0,20" />
-                
+
                 <StackLayout x:Name="StackSteps">
                     <Button ImageSource="img_add.png"
                 MaximumHeightRequest="30"
@@ -217,7 +217,7 @@
                 </StackLayout>-->
                 <!--#endregion-->
             
-            <!--#region DATOS PRINCIPALES -->
+            <!--#region DATOS PRINCIPALES-->
             <syncfusion:SfExpander>
                 <syncfusion:SfExpander.Header>
                     <Label Text="Datos Principales" 
